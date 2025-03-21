@@ -6,7 +6,7 @@ const CircuitSchema = new mongoose.Schema({
     location: { type: String, required: true },
     duration: { type: Number, required: true }, // Duration in hours
     price: { type: Number, required: true },
-    difficulty: { type: String, enum: ["easy", "medium", "hard"], required: true },
+    difficulty: { type: String, enum: ["Facile", "Moyen", "Difficile"], required: true },
     createdAt: { type: Date, default: Date.now }
 });
 
