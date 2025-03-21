@@ -2,21 +2,19 @@ const express = require("express");
 const router = express.Router();
 const usersController = require("../controllers/usersController");
 const verifyJWT = require("../middleware/verifyJWT");
-const verifyAdmin = require("../middleware/verifyAdmin");  // Import admin middleware
+const verifyAdmin = require("../middleware/verifyAdmin"); // Import admin middleware
 
 // ✅ Protect all routes with JWT authentication
 router.use(verifyJWT);
 
 // ✅ Get all users (Admin only)
-router.get("/", verifyAdmin,usersController.getAllUsers);
+router.get("/", verifyAdmin, usersController.getAllUsers);
 
 // ✅ Update user (Admin only)
-router.put("/:id", verifyAdmin,usersController.updateUser);
+router.put("/:id", verifyAdmin, usersController.updateUser);
 
 // ✅ Delete user (Admin only)
-router.delete("/:id",verifyAdmin, usersController.deleteUser);
-
-
+router.delete("/:id", verifyAdmin, usersController.deleteUser);
 
 // Get user profile
 router.get("/profile", verifyJWT, async (req, res) => {

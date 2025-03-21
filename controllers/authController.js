@@ -93,7 +93,13 @@ const login = async (req, res) => {
 
     // Generate an access token
     const accessToken = jwt.sign(
-      { UserInfo: { id: foundUser._id, role: foundUser.role } },
+      { UserInfo: { id: foundUser._id,
+        email: foundUser.email,
+        first_name: foundUser.first_name,
+        last_name: foundUser.last_name,
+        phone_number: foundUser.phone_number,
+        gender: foundUser.gender,
+        role: foundUser.role, } },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "15m" }
     );
