@@ -11,6 +11,7 @@ const PORT = process.env.PORT || 5000;
 const circuitRoutes = require("./routes/circuitRoutes");
 const reservationRoutes = require("./routes/reservationRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
+const serviceRoutes = require("./routes/serviceRoutes.js");
 
 connectDB();
 
@@ -27,6 +28,7 @@ app.use("/users", require("./routes/userRoutes.js"));
 app.use("/api/circuits", circuitRoutes);
 app.use("/api/reservations", reservationRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/services", serviceRoutes);
 
 app.all("*", (req,res)=>{
     res.status(404)
