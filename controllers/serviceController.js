@@ -1,15 +1,20 @@
 const Service = require("../models/Service");
 
 // Get all services
+// controllers/serviceController.js
+
 const getAllServices = async (req, res) => {
   try {
-    const services = await Service.find().populate("fournisseur", "first_name last_name phone_number");
+    let query = {};
+    if (req.user.role === 'fournisseur') {
+      query.fournisseur = req.user.id;
+    }
+    const services = await Service.find(query).populate("fournisseur", "first_name last_name phone_number");
     res.status(200).json(services);
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur", error });
   }
 };
-
 // Get a service by ID
 const getServiceById = async (req, res) => {
   try {
