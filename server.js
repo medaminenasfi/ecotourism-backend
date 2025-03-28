@@ -12,7 +12,8 @@ const circuitRoutes = require("./routes/circuitRoutes");
 const reservationRoutes = require("./routes/reservationRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const serviceRoutes = require("./routes/serviceRoutes.js");
-
+const avisRoutes = require("./routes/avisRoutes");
+const reclamationRoutes = require("./routes/reclamationRoutes");
 connectDB();
 
 app.use(cors(corsOptions));
@@ -29,6 +30,9 @@ app.use("/api/circuits", circuitRoutes);
 app.use("/api/reservations", reservationRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/services", serviceRoutes);
+app.use("/api/avis", avisRoutes);
+app.use("/api/reclamations", reclamationRoutes);
+
 
 app.all("*", (req,res)=>{
     res.status(404)
