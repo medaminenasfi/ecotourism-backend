@@ -75,7 +75,6 @@ router.put("/:id", verifyJWT, async (req, res) => {
 });
 
 // Supprimer une réclamation
-// Supprimer une réclamation
 router.delete("/:id", verifyJWT, async (req, res) => {
   try {
     const { id } = req.params; // ID de la réclamation
