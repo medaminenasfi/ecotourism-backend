@@ -45,22 +45,20 @@ const deleteAvis = async (req, res) => {
 // Get all reviews
 const getAllAvis = async (req, res) => {
   try {
-    const avis = await Avis.find();
+    const avis = await Avis.find().populate('userId', 'first_name last_name'); // Populate user details
     res.status(200).json({ avis });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 // Get reviews for a specific circuit
 const getAvisByCircuit = async (req, res) => {
   try {
     const { circuitId } = req.params;
-    const avis = await Avis.find({ circuitId });
+    const avis = await Avis.find({ circuitId }).populate('userId', 'first_name last_name'); // Populate user details
     res.status(200).json({ avis });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 module.exports = { addAvis, updateAvis, deleteAvis, getAllAvis, getAvisByCircuit };
