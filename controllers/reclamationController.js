@@ -43,25 +43,23 @@ const deleteReclamation = async (req, res) => {
 
 const getAllReclamations = async (req, res) => {
   try {
-    // Token should already be verified by `verifyJWT`
-    const reclamations = await Reclamation.find();
+    const reclamations = await Reclamation.find()
+      .populate('userId', 'name email'); // Populate name & email from User
     res.status(200).json({ reclamations });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Server error occurred while fetching reclamations.' });
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
-
-// Get reclamations for a specific user
+// Get reclamations by user (with user details)
 const getReclamationsByUser = async (req, res) => {
   try {
     const { userId } = req.params;
-    const reclamations = await Reclamation.find({ userId });
+    const reclamations = await Reclamation.find({ userId })
+      .populate('userId', 'name'); // Populate only the name
     res.status(200).json({ reclamations });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 module.exports = { addReclamation, updateReclamation, deleteReclamation, getAllReclamations, getReclamationsByUser };
