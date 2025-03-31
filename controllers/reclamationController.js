@@ -16,12 +16,24 @@ const addReclamation = async (req, res) => {
 const updateReclamation = async (req, res) => {
   try {
     const reclamation = await Reclamation.findById(req.params.id);
-    if (!reclamation || reclamation.userId.toString() !== req.user.id) {
-      return res.status(403).json({ message: "Non autorisé" });
+    if (!reclamation) return res.status(404).json({ message: "Reclamation not found" });
+
+    // Allow admin or owner to update
+    if (req.user.role !== 'admin' && reclamation.userId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized" });
     }
-    reclamation.status = req.body.status;
+
+    // Admins can only update status
+    if (req.user.role === 'admin') {
+      reclamation.status = req.body.status;
+    } else {
+      reclamation.type = req.body.type;
+      reclamation.message = req.body.message;
+      reclamation.status = req.body.status;
+    }
+
     await reclamation.save();
-    res.json({ message: "Réclamation mise à jour", reclamation });
+    res.json({ message: "Reclamation updated", reclamation });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -31,11 +43,14 @@ const updateReclamation = async (req, res) => {
 const deleteReclamation = async (req, res) => {
   try {
     const reclamation = await Reclamation.findById(req.params.id);
-    if (!reclamation || reclamation.userId.toString() !== req.user.id) {
-      return res.status(403).json({ message: "Non autorisé" });
+    if (!reclamation) return res.status(404).json({ message: "Reclamation not found" });
+
+    if (req.user.role !== 'admin' && reclamation.userId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized" });
     }
+
     await reclamation.deleteOne();
-    res.json({ message: "Réclamation supprimée" });
+    res.json({ message: "Reclamation deleted" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -44,12 +59,13 @@ const deleteReclamation = async (req, res) => {
 const getAllReclamations = async (req, res) => {
   try {
     const reclamations = await Reclamation.find()
-      .populate('userId', 'name email'); // Populate name & email from User
+      .populate('userId', 'first_name last_name email'); // Changed to first/last name
     res.status(200).json({ reclamations });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
 
 // Get reclamations by user (with user details)
 const getReclamationsByUser = async (req, res) => {
