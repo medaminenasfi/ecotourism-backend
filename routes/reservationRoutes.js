@@ -9,6 +9,8 @@ router.use(verifyJWT);
 
 // ✅ Get all reservations (Admin only)
 router.get("/", verifyAdmin, reservationsController.getAllReservations);
+// ✅ Get all reservations for the logged-in user
+router.get("/my-reservations", reservationsController.getUserReservations);
 
 // ✅ Get a single reservation by ID
 router.get("/:id", reservationsController.getReservationById);

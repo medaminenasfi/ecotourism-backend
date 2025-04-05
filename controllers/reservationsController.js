@@ -94,3 +94,24 @@ exports.deleteReservation = async (req, res) => {
     res.status(500).json({ message: 'Error deleting reservation', error: err.message });
   }
 };
+// ✅ Get reservations of the logged-in user
+exports.getUserReservations = async (req, res) => {
+  try {
+    if (!req.user?.id) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    const userId = req.user.id;
+    const reservations = await Reservation.find({ user: userId })
+      .populate('circuit')
+      .sort({ date: -1 }); // Sort by date descending
+
+    res.status(200).json(reservations);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ 
+      message: 'Error fetching your reservations', 
+      error: err.message 
+    });
+  }
+};
