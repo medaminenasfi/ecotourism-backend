@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: ["admin", "fournisseur", "voyageur"],
-      default: "voyageur", // Définir un rôle par défaut
+      default: "voyageur", 
       required: true,
     },
   },

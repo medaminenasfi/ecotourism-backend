@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 
-// ✅ Get all users (Admin only)
+// Get all users (Admin only)
 const getAllUsers = async (req, res) => {
   if (req.user.role !== "admin") {
     return res.status(403).json({ message: "Access denied: Admins only" });
@@ -19,7 +19,7 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-// ✅ Update user details (Admin only)
+// Update user details (Admin only)
 const updateUser = async (req, res) => {
   if (req.user.role !== "admin") {
     return res.status(403).json({ message: "Access denied: Admins only" });
@@ -49,7 +49,7 @@ const updateUser = async (req, res) => {
   }
 };
 
-// ✅ Delete user (Admin only)
+//  Delete user (Admin only)
 const deleteUser = async (req, res) => {
   if (req.user.role !== "admin") {
     return res.status(403).json({ message: "Access denied: Admins only" });

@@ -2,17 +2,15 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-// ✅ REGISTER (INSCRIPTION)
+// (INSCRIPTION)
 const register = async (req, res) => {
   try {
     const { first_name, last_name, phone_number, gender, role, email, password } = req.body;
 
-    // Validate required fields
     if (!first_name || !last_name || !phone_number || !gender || !role || !email || !password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // Ensure only ONE admin exists
     if (role === "admin") {
       const existingAdmin = await User.findOne({ role: "admin" }).exec();
       if (existingAdmin) {
@@ -20,16 +18,13 @@ const register = async (req, res) => {
       }
     }
 
-    // Check if the user already exists
     const foundUser = await User.findOne({ email }).exec();
     if (foundUser) {
       return res.status(409).json({ message: 'User already exists' });
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new user
     const user = await User.create({
       first_name,
       last_name,
@@ -40,17 +35,14 @@ const register = async (req, res) => {
       password: hashedPassword,
     });
 
-    // Log the created user (optional)
     console.log("User created:", user);
 
-    // Generate an access token
     const accessToken = jwt.sign(
       { UserInfo: { id: user._id, role: user.role } },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "15m" }
     );
 
-    // Send the response
     res.status(201).json({
       message: "User registered successfully",
       accessToken,
@@ -71,7 +63,7 @@ const register = async (req, res) => {
   }
 };
 
-// ✅ LOGIN
+//  LOGIN
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -126,7 +118,7 @@ const login = async (req, res) => {
   }
 };
 
-// ✅ REFRESH TOKEN
+//  REFRESH TOKEN
 const refresh = (req, res) => {
   try {
     const cookies = req.cookies;
@@ -158,7 +150,7 @@ const refresh = (req, res) => {
   }
 };
 
-// ✅ LOGOUT
+// LOGOUT
 const logout = (req, res) => {
   try {
     const cookies = req.cookies;
@@ -180,7 +172,7 @@ const logout = (req, res) => {
   }
 };
 
-// ✅ ADMIN LOGIN
+//  ADMIN LOGIN
 const loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
