@@ -3,19 +3,19 @@ const router = express.Router();
 const verifyJWT = require("../middleware/verifyJWT");
 const { addReclamation, updateReclamation, deleteReclamation, getAllReclamations, getReclamationsByUser } = require("../controllers/reclamationController");
 
-// Add a reclamation
+// ajouter reclamation
 router.post("/", verifyJWT, addReclamation);
 
-// Update a reclamation
+// moddifreclamation
 router.put("/:id", verifyJWT, updateReclamation);
 
-// Delete a reclamation
+// supp reclamation
 router.delete("/:id", verifyJWT, deleteReclamation);
 
-// Get all reclamations
+// tous reclamations
 router.get("/", verifyJWT, getAllReclamations);
 
-// Get reclamations for a specific user
+// reclamatin utik
 router.get("/user/:userId", verifyJWT, getReclamationsByUser);
 
 module.exports = router;

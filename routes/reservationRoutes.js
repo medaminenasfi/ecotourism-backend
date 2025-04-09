@@ -4,24 +4,24 @@ const reservationsController = require("../controllers/reservationsController");
 const verifyJWT = require("../middleware/verifyJWT");
 const verifyAdmin = require("../middleware/verifyAdmin");
 
-// ✅ Protect all routes with JWT authentication
+
 router.use(verifyJWT);
 
-// ✅ Get all reservations (Admin only)
+// tout reser
 router.get("/", verifyAdmin, reservationsController.getAllReservations);
-// ✅ Get all reservations for the logged-in user
+// tout reser
 router.get("/my-reservations", reservationsController.getUserReservations);
 
-// ✅ Get a single reservation by ID
+// seul reserv
 router.get("/:id", reservationsController.getReservationById);
 
-// ✅ Create a new reservation
+// crée reser
 router.post("/", reservationsController.createReservation);
 
-// ✅ Update a reservation (Admin only)
+// mododifier  reser
 router.put("/:id", verifyAdmin, reservationsController.updateReservation);
 
-// ✅ Delete a reservation (Admin only)
+// suppr reser
 router.delete("/:id", verifyAdmin, reservationsController.deleteReservation);
 
 module.exports = router;

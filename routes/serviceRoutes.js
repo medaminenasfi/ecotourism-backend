@@ -11,19 +11,19 @@ const {
   deleteService,
 } = require("../controllers/serviceController");
 
-// Get all services (Accessible by admins, suppliers, and travelers)
+// tous les services
 router.get("/", verifyToken, verifyRole(["admin", "fournisseur", "voyageur"]), getAllServices);
 
-// Get service details by ID (Accessible by all authenticated users)
+// sevice id
 router.get("/:id", verifyToken, getServiceById);
 
-// Create a new service (Only for suppliers)
+// creée servi
 router.post("/", verifyToken, verifyRole(["fournisseur"]), createService);
 
-// Update a service (Only for suppliers)
+// modifier serv
 router.put("/:id", verifyToken, verifyRole(["fournisseur"]), updateService);
 
-// Delete a service (Only for admins and suppliers)
+// supprimer servi
 router.delete("/:id", verifyToken, verifyRole(["admin", "fournisseur"]), deleteService);
 
 module.exports = router;

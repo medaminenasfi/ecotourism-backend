@@ -3,19 +3,19 @@ const router = express.Router();
 const verifyJWT = require("../middleware/verifyJWT");
 const { addAvis, updateAvis, deleteAvis, getAllAvis, getAvisByCircuit } = require("../controllers/avisController");
 
-// Add a review
+// creer review
 router.post("/", verifyJWT, addAvis);
 
-// Update a review
+// modiif review
 router.put("/:id", verifyJWT, updateAvis);
 
-// Delete a review
+//suppreview
 router.delete("/:id", verifyJWT, deleteAvis);
 
-// Get all reviews
+// tousreviews
 router.get("/", verifyJWT, getAllAvis);
 
-// Get reviews for a specific circuit
+// reviews  circuit
 router.get("/circuit/:circuitId", verifyJWT, getAvisByCircuit);
 
 module.exports = router;
