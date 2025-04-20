@@ -31,42 +31,45 @@ exports.getReservationById = async (req, res) => {
 // Create a new reservation
 exports.createReservation = async (req, res) => {
   try {
-    const { user, circuit, date, numberOfPeople, totalPrice } = req.body;
+    const { user, circuit, circuitDetails, date, numberOfPeople, totalPrice, isTempCircuit } = req.body;
 
-    // Check if all required fields are provided
-    if (!user || !circuit || !date || !numberOfPeople || !totalPrice) {
-      return res.status(400).json({ message: 'Missing required fields' });
+    // Validate required fields
+    if (!user || !date || !numberOfPeople || !totalPrice) {
+      return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // Validate ObjectId format for user and circuit
-    if (!mongoose.Types.ObjectId.isValid(user) || !mongoose.Types.ObjectId.isValid(circuit)) {
-      return res.status(400).json({ message: 'Invalid user or circuit ID format' });
+    // Validate circuit reference for database circuits
+    if (!isTempCircuit && !mongoose.Types.ObjectId.isValid(circuit)) {
+      return res.status(400).json({ message: "Invalid circuit ID format" });
     }
 
-    // Check if user and circuit exist
-    const foundUser = await User.findById(user);
-    const foundCircuit = await Circuit.findById(circuit);
-    
-    if (!foundUser) return res.status(404).json({ message: 'User not found' });
-    if (!foundCircuit) return res.status(404).json({ message: 'Circuit not found' });
+    // Validate temp circuit details
+    if (isTempCircuit && (!circuitDetails?.name || !circuitDetails?.price)) {
+      return res.status(400).json({ message: "Invalid circuit details" });
+    }
 
-    // Create a new reservation
-    const newReservation = new Reservation({
+    // Check user existence
+    const userExists = await User.exists({ _id: user });
+    if (!userExists) return res.status(404).json({ message: "User not found" });
+
+    const reservationData = {
       user,
-      circuit,
       date,
       numberOfPeople,
       totalPrice,
-    });
+      isTempCircuit,
+      ...(isTempCircuit 
+        ? { circuitDetails } 
+        : { circuit })
+    };
 
-    await newReservation.save();
+    const newReservation = await Reservation.create(reservationData);
     res.status(201).json(newReservation);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error creating reservation', error: err.message });
+
+  } catch (error) {
+    res.status(500).json({ message: 'Reservation failed', error: error.message });
   }
 };
-
 // Update a reservation
 exports.updateReservation = async (req, res) => {
   try {

@@ -26,32 +26,26 @@ exports.getCircuitById = async (req, res) => {
 };
 
 // Create a new circuit
+// controllers/circuitsController.js
 exports.createCircuit = async (req, res) => {
   try {
-    const { name, description, location, duration, price, difficulty } = req.body;
-
-    // Check if all required fields are provided
-    if (!name || !description || !location || !duration || !price || !difficulty) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    // Create a new circuit
-    const newCircuit = new Circuit({
+    const { name, description, duration, price, difficulty } = req.body;
+    
+    const newCircuit = await Circuit.create({
       name,
       description,
-      location,
       duration,
       price,
-      difficulty,
+      difficulty
     });
-
-    await newCircuit.save();
+    
     res.status(201).json(newCircuit);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error creating circuit', error: err.message });
+  } catch (error) {
+    res.status(500).json({ message: 'Error creating circuit', error: error.message });
   }
 };
+
+// Remove all coordinate/region-related logic
 
 // Update a circuit
 exports.updateCircuit = async (req, res) => {
