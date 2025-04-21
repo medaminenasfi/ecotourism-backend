@@ -32,7 +32,13 @@ const ReservationSchema = new mongoose.Schema({
   isTempCircuit: {
     type: Boolean,
     default: false
-  }
+  },
+  // In Reservation model
+status: {
+  type: String,
+  enum: ['pending', 'confirmed', 'cancelled'],
+  default: 'pending'
+}
 }, { timestamps: true });
 
 module.exports = mongoose.model("Reservation", ReservationSchema);
