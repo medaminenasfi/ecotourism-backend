@@ -84,13 +84,19 @@ exports.updateReservation = async (req, res) => {
   }
 };
 
-// Delete a reservation
 exports.deleteReservation = async (req, res) => {
   try {
-    const deletedReservation = await Reservation.findByIdAndDelete(req.params.id);
-    if (!deletedReservation) {
+    const reservation = await Reservation.findById(req.params.id);
+    if (!reservation) {
       return res.status(404).json({ message: 'Reservation not found' });
     }
+
+    // Check if user is admin OR the owner of the reservation
+    if (req.user.role !== 'admin' && reservation.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Unauthorized: Cannot delete this reservation' });
+    }
+
+    await Reservation.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: 'Reservation deleted successfully' });
   } catch (err) {
     console.error(err);

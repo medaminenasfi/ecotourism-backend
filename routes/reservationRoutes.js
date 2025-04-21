@@ -22,6 +22,6 @@ router.post("/", reservationsController.createReservation);
 router.put("/:id", verifyAdmin, reservationsController.updateReservation);
 
 // suppr reser
-router.delete("/:id", verifyAdmin, reservationsController.deleteReservation);
+router.delete("/:id", reservationsController.deleteReservation);
 
 module.exports = router;
