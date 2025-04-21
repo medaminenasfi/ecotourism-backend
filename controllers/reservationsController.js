@@ -31,10 +31,10 @@ exports.getReservationById = async (req, res) => {
 // Create a new reservation
 exports.createReservation = async (req, res) => {
   try {
-    const { user, circuit, circuitDetails, date, numberOfPeople, totalPrice, isTempCircuit } = req.body;
+    const { user,  name,circuit, circuitDetails, date, numberOfPeople, totalPrice, isTempCircuit } = req.body;
 
     // Validate required fields
-    if (!user || !date || !numberOfPeople || !totalPrice) {
+    if (!user || !date || !numberOfPeople || !totalPrice  || !name) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
