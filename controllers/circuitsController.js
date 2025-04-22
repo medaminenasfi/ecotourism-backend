@@ -26,14 +26,14 @@ exports.getCircuitById = async (req, res) => {
 };
 
 // Create a new circuit
-// controllers/circuitsController.js
 exports.createCircuit = async (req, res) => {
   try {
-    const { name, description, duration, price, difficulty } = req.body;
+    const { name, description, location, duration, price, difficulty } = req.body;
     
     const newCircuit = await Circuit.create({
       name,
       description,
+      location, 
       duration,
       price,
       difficulty
