@@ -27,10 +27,10 @@ exports.recommendCircuit = async (req, res) => {
   En te basant sur ces éléments, recommande un circuit écotouristique idéal en Tunisie.
 
   ❗Format attendu :
-  - 📍 Région(s) suggérée(s) :
+  - 📍 Région  :
   - 📅 Durée totale : 
   - 📆 Période idéale :
-  - 🗓️ Jour par jour : (Jour 1 : ..., Jour 2 : ..., etc.)
+  - 🗓️ Plan Jour par jour : (Jour 1 : ..., Jour 2 : ..., etc.)
   - 🌦️ Remarque météo :`,
 }
 
