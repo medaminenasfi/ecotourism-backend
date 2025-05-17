@@ -6,10 +6,13 @@ const mongoose = require('mongoose');
 // Get all reservations (Admin only)
 exports.getAllReservations = async (req, res) => {
   try {
-    const reservations = await Reservation.find().populate('user circuit');
+    const sort = req.query.sort || '-createdAt'; // Tri par défaut
+    const reservations = await Reservation.find()
+      .populate('user circuit')
+      .sort(sort);
+      
     res.status(200).json(reservations);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: 'Error fetching reservations', error: err.message });
   }
 };
