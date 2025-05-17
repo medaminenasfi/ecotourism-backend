@@ -34,6 +34,10 @@ app.use("/api/avis", avisRoutes);
 app.use("/api/reclamations", reclamationRoutes);
 
 
+app.use("/api/ai", require("./routes/aiRoutes"));
+
+
+
 app.all("*", (req,res)=>{
     res.status(404)
     if(req.accepts("html")){
