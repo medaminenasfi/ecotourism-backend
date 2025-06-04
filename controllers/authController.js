@@ -48,21 +48,21 @@ const register = async (req, res) => {
       accessToken,
       user: {
         id: user._id,
-        email: user.email,
         first_name: user.first_name,
         last_name: user.last_name,
+        email: user.email,
         phone_number: user.phone_number,
         gender: user.gender,
         role: user.role,
-      },
+      }
     });
-
   } catch (error) {
-    console.error("Error in register:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    console.error("Registration error:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
+module.exports = { register };
 //  LOGIN
 const login = async (req, res) => {
   try {
