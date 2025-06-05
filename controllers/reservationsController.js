@@ -125,3 +125,73 @@ exports.getUserReservations = async (req, res) => {
     res.status(500).json({ message: 'Error fetching reservations', error: err.message });
   }
 };
+exports.getPopularCircuitsStats = async (req, res) => {
+  try {
+    const popularCircuits = await Reservation.aggregate([
+      { $match: { circuit: { $ne: null } } },
+      { $group: { 
+        _id: '$circuit', 
+        reservationCount: { $sum: 1 } 
+      }},
+      { $sort: { reservationCount: -1 } },
+      { $limit: 5 }
+    ]);
+
+    const circuitIds = popularCircuits.map(item => item._id);
+    const circuits = await Circuit.find({ _id: { $in: circuitIds } });
+
+    const result = popularCircuits.map(item => {
+      const circuit = circuits.find(c => c._id.equals(item._id));
+      return {
+        circuitId: item._id,
+        circuitName: circuit ? circuit.name : 'Circuit inconnu',
+        reservationCount: item.reservationCount
+      };
+    });
+
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Nouvelle méthode: Revenus par mois
+exports.getRevenueByMonthStats = async (req, res) => {
+  try {
+    const revenueByMonth = await Reservation.aggregate([
+      { 
+        $group: {
+          _id: { 
+            year: { $year: "$date" },
+            month: { $month: "$date" }
+          },
+          totalRevenue: { $sum: "$totalPrice" },
+          reservationCount: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          month: { 
+            $dateToString: { 
+              format: "%Y-%m", 
+              date: { 
+                $dateFromParts: { 
+                  year: "$_id.year", 
+                  month: "$_id.month" 
+                } 
+              } 
+            } 
+          },
+          totalRevenue: 1,
+          reservationCount: 1
+        }
+      },
+      { $sort: { month: 1 } }
+    ]);
+
+    res.json(revenueByMonth);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

@@ -24,4 +24,16 @@ router.put("/:id", verifyAdmin, reservationsController.updateReservation);
 // suppr reser
 router.delete("/:id", reservationsController.deleteReservation);
 
+// Nouvelles routes de statistiques
+router.get(
+  '/stats/popular-circuits', 
+  verifyAdmin, 
+  reservationsController.getPopularCircuitsStats
+);
+
+router.get(
+  '/stats/revenue-by-month', 
+  verifyAdmin, 
+  reservationsController.getRevenueByMonthStats
+);
 module.exports = router;
