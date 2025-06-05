@@ -128,25 +128,70 @@ exports.getUserReservations = async (req, res) => {
 exports.getPopularCircuitsStats = async (req, res) => {
   try {
     const popularCircuits = await Reservation.aggregate([
-      { $match: { circuit: { $ne: null } } },
-      { $group: { 
-        _id: '$circuit', 
-        reservationCount: { $sum: 1 } 
-      }},
+      {
+        $facet: {
+          // Circuits standards
+          standard: [
+            { $match: { circuit: { $ne: null } } },
+            { $group: { 
+              _id: '$circuit', 
+              reservationCount: { $sum: 1 },
+              totalRevenue: { $sum: "$totalPrice" }
+            }},
+            { $sort: { reservationCount: -1 } },
+            { $limit: 5 }
+          ],
+          // Circuits personnalisés
+          custom: [
+            { $match: { circuit: null, "circuitDetails.name": { $exists: true } } },
+            { $group: { 
+              _id: '$circuitDetails.name', 
+              reservationCount: { $sum: 1 },
+              totalRevenue: { $sum: "$totalPrice" },
+              isCustom: { $first: true }
+            }},
+            { $sort: { reservationCount: -1 } },
+            { $limit: 5 }
+          ]
+        }
+      },
+      {
+        $project: {
+          combined: { $concatArrays: ["$standard", "$custom"] }
+        }
+      },
+      { $unwind: "$combined" },
+      { $replaceRoot: { newRoot: "$combined" } },
       { $sort: { reservationCount: -1 } },
-      { $limit: 5 }
+      { $limit: 10 }
     ]);
 
-    const circuitIds = popularCircuits.map(item => item._id);
-    const circuits = await Circuit.find({ _id: { $in: circuitIds } });
+    // Récupérer les détails des circuits standards
+    const standardIds = popularCircuits
+      .filter(item => !item.isCustom)
+      .map(item => item._id);
+    
+    const circuits = await Circuit.find({ _id: { $in: standardIds } });
 
     const result = popularCircuits.map(item => {
-      const circuit = circuits.find(c => c._id.equals(item._id));
-      return {
-        circuitId: item._id,
-        circuitName: circuit ? circuit.name : 'Circuit inconnu',
-        reservationCount: item.reservationCount
-      };
+      if (item.isCustom) {
+        return {
+          circuitId: null,
+          circuitName: item._id,
+          reservationCount: item.reservationCount,
+          totalRevenue: item.totalRevenue,
+          isCustom: true
+        };
+      } else {
+        const circuit = circuits.find(c => c._id.equals(item._id));
+        return {
+          circuitId: item._id,
+          circuitName: circuit ? circuit.name : 'Circuit inconnu',
+          reservationCount: item.reservationCount,
+          totalRevenue: item.totalRevenue,
+          isCustom: false
+        };
+      }
     });
 
     res.json(result);
