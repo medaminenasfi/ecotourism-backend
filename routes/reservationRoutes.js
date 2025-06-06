@@ -19,6 +19,8 @@ router.get("/:id", reservationsController.getReservationById);
 router.post("/", reservationsController.createReservation);
 
 // mododifier  reser
+// Remplacer la ligne existante par :
+router.put("/:id", reservationsController.updateReservation);
 router.put("/:id", verifyAdmin, reservationsController.updateReservation);
 
 // suppr reser

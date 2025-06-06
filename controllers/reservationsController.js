@@ -74,19 +74,65 @@ exports.createReservation = async (req, res) => {
   }
 };
 // Update a reservation
+// ... existing imports and code ...
+
+// Update a reservation
 exports.updateReservation = async (req, res) => {
   try {
-    const updatedReservation = await Reservation.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updatedReservation) {
+    const reservation = await Reservation.findById(req.params.id);
+    if (!reservation) {
       return res.status(404).json({ message: 'Reservation not found' });
     }
+ const isAdmin = req.user.role === 'admin';
+    const isOwner = reservation.user.toString() === req.user.id;
+    // Check permissions - user must own the reservation or be admin
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({ message: 'Unauthorized: Cannot update this reservation' });
+    }
+
+    // Extract updatable fields
+    const { date, numberOfPeople, status, totalPrice } = req.body; // Add status and totalPrice
+    if (status && !['pending', 'confirmed', 'cancelled'].includes(status)) {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+
+    if (totalPrice && totalPrice < 0) {
+      return res.status(400).json({ message: "Total price must be positive" });
+    }
+    // Validate date is in the future
+    if (date && new Date(date) < new Date()) {
+      return res.status(400).json({ message: "Reservation date must be in the future" });
+    }
+    
+    // Validate number of people
+    if (numberOfPeople && (numberOfPeople < 1 || numberOfPeople > 20)) {
+      return res.status(400).json({ message: "Number of people must be between 1 and 20" });
+    }
+
+    // Create update object
+    const updateData = {};
+    if (date) updateData.date = date;
+    if (numberOfPeople) updateData.numberOfPeople = numberOfPeople;
+if (status) updateData.status = status;             // Add this line
+    if (totalPrice) updateData.totalPrice = totalPrice; // Add this line
+    // Update the reservation
+    const updatedReservation = await Reservation.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    ).populate('user circuit');
+
     res.status(200).json(updatedReservation);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error updating reservation', error: err.message });
+    res.status(500).json({ 
+      message: 'Error updating reservation', 
+      error: err.message 
+    });
   }
 };
 
+// ... existing code ...
 exports.deleteReservation = async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id);
