@@ -1,9 +1,6 @@
 const Service = require("../models/Service");
 
 // Get all services
-// controllers/serviceController.js
-
-// Get all services (modified to let 'fournisseur' see all)
 const getAllServices = async (req, res) => {
   try {
     const services = await Service.find({})
@@ -31,7 +28,12 @@ const getServiceById = async (req, res) => {
 // Create a new service
 const createService = async (req, res) => {
   try {
-    const { type, description, photo, phoneNumber } = req.body;
+    const { type, description, phoneNumber } = req.body;
+    const photo = req.file ? `/uploads/${req.file.filename}` : null;
+
+    if (!type || !description || !phoneNumber) {
+      return res.status(400).json({ message: "Tous les champs requis doivent être remplis" });
+    }
 
     const newService = new Service({
       fournisseur: req.user.id,
@@ -51,7 +53,14 @@ const createService = async (req, res) => {
 // Update a service by ID
 const updateService = async (req, res) => {
   try {
-    const updatedService = await Service.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const { type, description, phoneNumber } = req.body;
+    const updateData = { type, description, phoneNumber };
+
+    if (req.file) {
+      updateData.photo = `/uploads/${req.file.filename}`;
+    }
+
+    const updatedService = await Service.findByIdAndUpdate(req.params.id, updateData, { new: true });
 
     if (!updatedService) return res.status(404).json({ message: "Service non trouvé" });
 
@@ -65,7 +74,7 @@ const updateService = async (req, res) => {
 const deleteService = async (req, res) => {
   try {
     if (!req.user) {
-      console.log("❌ req.user is undefined"); // DEBUG
+      console.log("❌ req.user is undefined");
       return res.status(401).json({ message: "Utilisateur non authentifié" });
     }
 
@@ -79,21 +88,17 @@ const deleteService = async (req, res) => {
 
     console.log("✅ Service found:", service);
 
-    // Vérifie si l'utilisateur est admin ou propriétaire
     if (req.user.role !== "admin" && service.fournisseur.toString() !== req.user.id) {
       return res.status(403).json({ message: "Accès interdit" });
     }
 
     await Service.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: "Service supprimé avec succès" });
-
   } catch (error) {
     console.error("❌ Delete Service Error:", error);
     res.status(500).json({ message: "Erreur serveur", error: error.message });
   }
 };
-
-;
 
 module.exports = {
   getAllServices,

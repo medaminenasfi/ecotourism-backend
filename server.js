@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs"); // Added for directory creation
 const corsOptions = require("./Config/corsOptions");
 const PORT = process.env.PORT || 5000;
 const circuitRoutes = require("./routes/circuitRoutes");
@@ -15,6 +16,14 @@ const serviceRoutes = require("./routes/serviceRoutes.js");
 const avisRoutes = require("./routes/avisRoutes");
 const reclamationRoutes = require("./routes/reclamationRoutes");
 connectDB();
+
+const uploadsDir = path.join(__dirname, "uploads");
+try {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log("Uploads directory created or already exists at:", uploadsDir);
+} catch (err) {
+  console.error("Error creating uploads directory:", err);
+}
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
@@ -36,6 +45,7 @@ app.use("/api/reclamations", reclamationRoutes);
 
 app.use("/api/ai", require("./routes/aiRoutes"));
 
+app.use('/uploads', express.static('uploads'));
 
 
 app.all("*", (req,res)=>{
