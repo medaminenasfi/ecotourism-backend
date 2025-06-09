@@ -5,6 +5,7 @@ const verifyJWT = require("../middleware/verifyJWT");
 const verifyAdmin = require("../middleware/verifyAdmin"); // Import admin middleware
 
 router.use(verifyJWT);
+router.put("/profile", usersController.updateUserProfile); // User updates own profile
 
 // Voir tous (Admin only)
 router.get("/", verifyAdmin, usersController.getAllUsers);
