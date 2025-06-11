@@ -17,13 +17,7 @@ const avisRoutes = require("./routes/avisRoutes");
 const reclamationRoutes = require("./routes/reclamationRoutes");
 connectDB();
 
-const uploadsDir = path.join(__dirname, "uploads");
-try {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-  console.log("Uploads directory created or already exists at:", uploadsDir);
-} catch (err) {
-  console.error("Error creating uploads directory:", err);
-}
+
 
 app.use(cors(corsOptions));
 app.use(cookieParser());

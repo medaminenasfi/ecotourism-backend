@@ -75,36 +75,44 @@ const deleteUser = async (req, res) => {
 };
 // Update own profile (for logged-in user)
 const updateUserProfile = async (req, res) => {
-  const { id } = req.user; // From JWT token
+  const { id } = req.user;
   const updates = req.body;
 
-  // Validate ObjectId
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ message: "Invalid user ID format" });
   }
 
-  // Prevent role changes
-  if (updates.role) {
-    return res.status(403).json({ message: "Cannot change user role" });
-  }
-
-  // Hash password if provided
-  if (updates.password) {
-    updates.password = await bcrypt.hash(updates.password, 10);
-  }
-
   try {
-    const updatedUser = await User.findByIdAndUpdate(
-      id,
-      updates,
-      { new: true, runValidators: true }
-    ).select("-password");
-
-    if (!updatedUser) {
+    const user = await User.findById(id);
+    if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json({ message: "Profile updated successfully", user: updatedUser });
+    // Update fields
+    user.first_name = updates.first_name || user.first_name;
+    user.last_name = updates.last_name || user.last_name;
+    user.phone_number = updates.phone_number || user.phone_number;
+    user.gender = updates.gender || user.gender;
+
+    let shouldLogout = false;
+    
+    // Handle password update
+    if (updates.password) {
+      user.password = await bcrypt.hash(updates.password, 10);
+      shouldLogout = true;
+    }
+
+    const updatedUser = await user.save();
+    
+    // Return full user data without password
+    const userWithoutPassword = updatedUser.toObject();
+    delete userWithoutPassword.password;
+
+    res.json({ 
+      message: "Profile updated successfully", 
+      user: userWithoutPassword,
+      shouldLogout
+    });
   } catch (err) {
     if (err.code === 11000) {
       return res.status(409).json({ message: "Email already in use" });
@@ -118,6 +126,5 @@ module.exports = {
   getAllUsers,
   updateUser,
   deleteUser,
-    updateUserProfile // Add this line
-
+    updateUserProfile 
 };
