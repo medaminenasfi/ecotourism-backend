@@ -9,8 +9,8 @@ const ReservationSchema = new mongoose.Schema({
   circuit: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Circuit' 
-  }, // For database circuits
-  circuitDetails: { // For map-created circuits
+  }, 
+  circuitDetails: { 
     name: String,
     price: Number,
     duration: Number,
@@ -33,7 +33,6 @@ const ReservationSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  // In Reservation model
 status: {
   type: String,
   enum: ['pending', 'confirmed', 'cancelled'],

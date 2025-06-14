@@ -59,7 +59,7 @@ const deleteReclamation = async (req, res) => {
 const getAllReclamations = async (req, res) => {
   try {
     const reclamations = await Reclamation.find()
-      .populate('userId', 'first_name last_name email'); // Changed to first/last name
+      .populate('userId', 'first_name last_name email'); 
     res.status(200).json({ reclamations });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
@@ -72,7 +72,7 @@ const getReclamationsByUser = async (req, res) => {
   try {
     const { userId } = req.params;
     const reclamations = await Reclamation.find({ userId })
-      .populate('userId', 'name'); // Populate only the name
+      .populate('userId', 'name');
     res.status(200).json({ reclamations });
   } catch (error) {
     res.status(500).json({ error: error.message });

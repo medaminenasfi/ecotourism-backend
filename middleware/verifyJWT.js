@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const verifyJWT = (req, res, next) => {
     const authHeader = req.headers["authorization"];
 
-    console.log("🔍 Incoming Auth Header:", authHeader); // Debugging Log
+    console.log("🔍 Incoming Auth Header:", authHeader); 
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
         console.log("❌ No valid token found.");

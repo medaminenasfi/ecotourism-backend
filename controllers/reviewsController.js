@@ -5,13 +5,11 @@ const Circuit = require('../models/Circuit');
 exports.createReview = async (req, res) => {
     try {
         const { circuitId, rating, comment } = req.body;
-        const userId = req.user.id; // Get user ID from JWT
+        const userId = req.user.id;
 
-        // Check if circuit exists
         const circuit = await Circuit.findById(circuitId);
         if (!circuit) return res.status(404).json({ message: 'Circuit not found' });
 
-        // Create new review
         const review = new Review({ user: userId, circuitId, rating, comment });
         await review.save();
 
@@ -37,7 +35,6 @@ exports.updateReview = async (req, res) => {
         const review = await Review.findById(req.params.id);
         if (!review) return res.status(404).json({ message: 'Review not found' });
 
-        // Check if the user is the review owner
         if (review.user.toString() !== req.user.id) {
             return res.status(403).json({ message: 'Unauthorized' });
         }

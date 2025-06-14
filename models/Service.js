@@ -13,7 +13,7 @@ const serviceSchema = new mongoose.Schema(
       required: true,
     },
     description: { type: String, required: true },
-    photo: { type: String }, // Stores file path (e.g., /uploads/filename.jpg)
+    photo: { type: String }, 
     phoneNumber: { type: String, required: true }, 
   },
   { timestamps: true }

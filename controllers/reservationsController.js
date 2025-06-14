@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 // Get all reservations (Admin only)
 exports.getAllReservations = async (req, res) => {
   try {
-    const sort = req.query.sort || '-createdAt'; // Tri par défaut
+    const sort = req.query.sort || '-createdAt'; 
     const reservations = await Reservation.find()
       .populate('user circuit')
       .sort(sort);
@@ -36,22 +36,18 @@ exports.createReservation = async (req, res) => {
   try {
     const { user,  name,circuit, circuitDetails, date, numberOfPeople, totalPrice, isTempCircuit } = req.body;
 
-    // Validate required fields
     if (!user || !date || !numberOfPeople || !totalPrice  || !name) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // Validate circuit reference for database circuits
     if (!isTempCircuit && !mongoose.Types.ObjectId.isValid(circuit)) {
       return res.status(400).json({ message: "Invalid circuit ID format" });
     }
 
-    // Validate temp circuit details
     if (isTempCircuit && (!circuitDetails?.name || !circuitDetails?.price)) {
       return res.status(400).json({ message: "Invalid circuit details" });
     }
 
-    // Check user existence
     const userExists = await User.exists({ _id: user });
     if (!userExists) return res.status(404).json({ message: "User not found" });
 
@@ -73,8 +69,6 @@ exports.createReservation = async (req, res) => {
     res.status(500).json({ message: 'Reservation failed', error: error.message });
   }
 };
-// Update a reservation
-// ... existing imports and code ...
 
 // Update a reservation
 exports.updateReservation = async (req, res) => {
@@ -85,7 +79,6 @@ exports.updateReservation = async (req, res) => {
     }
  const isAdmin = req.user.role === 'admin';
     const isOwner = reservation.user.toString() === req.user.id;
-    // Check permissions - user must own the reservation or be admin
     if (!isAdmin && !isOwner) {
       return res.status(403).json({ message: 'Unauthorized: Cannot update this reservation' });
     }
@@ -99,12 +92,10 @@ exports.updateReservation = async (req, res) => {
     if (totalPrice && totalPrice < 0) {
       return res.status(400).json({ message: "Total price must be positive" });
     }
-    // Validate date is in the future
     if (date && new Date(date) < new Date()) {
       return res.status(400).json({ message: "Reservation date must be in the future" });
     }
     
-    // Validate number of people
     if (numberOfPeople && (numberOfPeople < 1 || numberOfPeople > 20)) {
       return res.status(400).json({ message: "Number of people must be between 1 and 20" });
     }
@@ -113,9 +104,8 @@ exports.updateReservation = async (req, res) => {
     const updateData = {};
     if (date) updateData.date = date;
     if (numberOfPeople) updateData.numberOfPeople = numberOfPeople;
-if (status) updateData.status = status;             // Add this line
-    if (totalPrice) updateData.totalPrice = totalPrice; // Add this line
-    // Update the reservation
+if (status) updateData.status = status;             
+    if (totalPrice) updateData.totalPrice = totalPrice; 
     const updatedReservation = await Reservation.findByIdAndUpdate(
       req.params.id,
       updateData,
@@ -132,7 +122,6 @@ if (status) updateData.status = status;             // Add this line
   }
 };
 
-// ... existing code ...
 exports.deleteReservation = async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id);
@@ -140,7 +129,6 @@ exports.deleteReservation = async (req, res) => {
       return res.status(404).json({ message: 'Reservation not found' });
     }
 
-    // Check if user is admin OR the owner of the reservation
     if (req.user.role !== 'admin' && reservation.user.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Unauthorized: Cannot delete this reservation' });
     }
@@ -152,14 +140,13 @@ exports.deleteReservation = async (req, res) => {
     res.status(500).json({ message: 'Error deleting reservation', error: err.message });
   }
 };
-// ✅ Get reservations of the logged-in user
+//  Get reservations of the logged-in user
 exports.getUserReservations = async (req, res) => {
   try {
     const reservations = await Reservation.find({ user: req.user.id })
       .lean()
       .sort({ createdAt: -1 });
 
-    // Add explicit circuitDetails field
     const enhancedReservations = reservations.map(res => ({
       ...res,
       circuitDetails: res.circuitDetails || null,
@@ -176,7 +163,6 @@ exports.getPopularCircuitsStats = async (req, res) => {
     const popularCircuits = await Reservation.aggregate([
       {
         $facet: {
-          // Circuits standards
           standard: [
             { $match: { circuit: { $ne: null } } },
             { $group: { 
@@ -187,7 +173,6 @@ exports.getPopularCircuitsStats = async (req, res) => {
             { $sort: { reservationCount: -1 } },
             { $limit: 5 }
           ],
-          // Circuits personnalisés
           custom: [
             { $match: { circuit: null, "circuitDetails.name": { $exists: true } } },
             { $group: { 
@@ -212,7 +197,6 @@ exports.getPopularCircuitsStats = async (req, res) => {
       { $limit: 10 }
     ]);
 
-    // Récupérer les détails des circuits standards
     const standardIds = popularCircuits
       .filter(item => !item.isCustom)
       .map(item => item._id);
@@ -246,7 +230,7 @@ exports.getPopularCircuitsStats = async (req, res) => {
   }
 };
 
-// Nouvelle méthode: Revenus par mois
+//  méthode: Revenus par mois
 exports.getRevenueByMonthStats = async (req, res) => {
   try {
     const revenueByMonth = await Reservation.aggregate([

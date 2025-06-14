@@ -12,10 +12,9 @@ const verifyToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-    // Correct payload structure access
     req.user = {
       id: decoded.UserInfo.id,
-      role: decoded.UserInfo.role.toLowerCase() || ""  // Normalize to lowercase
+      role: decoded.UserInfo.role.toLowerCase() || ""  
     };
 
     console.log(`Authenticated user: ${req.user.id} (${req.user.role})`);

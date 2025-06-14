@@ -45,7 +45,6 @@ exports.createCircuit = async (req, res) => {
   }
 };
 
-// Remove all coordinate/region-related logic
 
 // Update a circuit
 exports.updateCircuit = async (req, res) => {

@@ -17,8 +17,6 @@ const avisRoutes = require("./routes/avisRoutes");
 const reclamationRoutes = require("./routes/reclamationRoutes");
 connectDB();
 
-
-
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());

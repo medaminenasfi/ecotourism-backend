@@ -73,7 +73,6 @@ const login = async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // Find user by email
     const foundUser = await User.findOne({ email }).exec();
     if (!foundUser) {
       return res.status(401).json({ message: 'User does not exist' });
@@ -83,7 +82,6 @@ const login = async (req, res) => {
     const match = await bcrypt.compare(password, foundUser.password);
     if (!match) return res.status(401).json({ message: 'Wrong password' });
 
-    // Generate an access token
     const accessToken = jwt.sign(
       { UserInfo: { id: foundUser._id,
         email: foundUser.email,
@@ -96,7 +94,6 @@ const login = async (req, res) => {
       { expiresIn: "15m" }
     );
 
-    // Send the response with the token and user info
     res.json({
       message: "Login successful",
       accessToken,
@@ -129,18 +126,15 @@ const refresh = (req, res) => {
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decoded) => {
       if (err) return res.status(403).json({ message: 'Forbidden' });
 
-      // Find the user associated with the refresh token
       const foundUser = await User.findById(decoded.UserInfo.id).exec();
       if (!foundUser) return res.status(401).json({ message: 'Unauthorized' });
 
-      // Generate a new access token
       const accessToken = jwt.sign(
         { UserInfo: { id: foundUser._id, role: foundUser.role } },
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: "15m" }
       );
 
-      // Return the new access token
       res.json({ accessToken });
     });
 
@@ -156,14 +150,12 @@ const logout = (req, res) => {
     const cookies = req.cookies;
     if (!cookies?.jwt) return res.status(200).json({ message: "logout successful" });
 
-    // Clear the cookie
     res.clearCookie('jwt', {
       httpOnly: true,
-      sameSite: 'None', // Needed for cross-site cookies
-      secure: process.env.NODE_ENV === 'production', // Only true for HTTPS in production
+      sameSite: 'None', 
+      secure: process.env.NODE_ENV === 'production', 
     });
 
-    // Send response
     res.status(200).json({ message: 'Logged out successfully' });
 
   } catch (error) {
@@ -177,7 +169,6 @@ const loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate required fields
     if (!email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -192,14 +183,12 @@ const loginAdmin = async (req, res) => {
     const match = await bcrypt.compare(password, foundUser.password);
     if (!match) return res.status(401).json({ message: "Wrong password" });
 
-    // Generate an access token
     const accessToken = jwt.sign(
       { UserInfo: { id: foundUser._id, role: foundUser.role } },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "15m" }
     );
 
-    // Send the response with the token
     res.json({
       message: "Admin login successful",
       accessToken,

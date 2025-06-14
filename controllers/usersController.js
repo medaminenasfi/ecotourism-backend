@@ -28,7 +28,6 @@ const updateUser = async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
 
-  // Validate ObjectId
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ message: "Invalid user ID format" });
   }
@@ -57,7 +56,6 @@ const deleteUser = async (req, res) => {
 
   const { id } = req.params;
 
-  // Validate ObjectId
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ message: "Invalid user ID format" });
   }
@@ -88,7 +86,6 @@ const updateUserProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Update fields
     user.first_name = updates.first_name || user.first_name;
     user.last_name = updates.last_name || user.last_name;
     user.phone_number = updates.phone_number || user.phone_number;
@@ -96,7 +93,6 @@ const updateUserProfile = async (req, res) => {
 
     let shouldLogout = false;
     
-    // Handle password update
     if (updates.password) {
       user.password = await bcrypt.hash(updates.password, 10);
       shouldLogout = true;
@@ -104,7 +100,6 @@ const updateUserProfile = async (req, res) => {
 
     const updatedUser = await user.save();
     
-    // Return full user data without password
     const userWithoutPassword = updatedUser.toObject();
     delete userWithoutPassword.password;
 
